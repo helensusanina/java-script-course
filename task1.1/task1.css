@@ -1,0 +1,7 @@
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    min-width: 15px;
+    box-shadow: 8px 8px 8px 8px rgba(135, 206, 250);
+    padding: 120px;
+}
