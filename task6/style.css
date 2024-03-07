@@ -1,0 +1,9 @@
+html {
+    margin: auto;
+    background-size: cover;
+    min-height: 100vh;
+}
+
+button{
+    margin: 50px;
+}
