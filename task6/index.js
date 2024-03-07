@@ -20,6 +20,7 @@ showPrototypesButtonElement.addEventListener("click", () => {
     }
 
     prototypesListElement.innerHTML = "";
+    
     prototypesListElement.appendChild(
         document.createTextNode("Список прототипов:")
     );
