@@ -8,9 +8,47 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
           integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <title>TODO</title>
-    <script defer type="module">
-        import {createTodoApp} from './todo-app.js'
-        createTodoApp(document.getElementById('todo-app'), 'Мои дела',"Я")
+    <script type="module">
+        import { createTodoApp } from './todo-app/view.js'
+        async function createTodoAppSwitch(modulePath, owner) {
+            const module = await import(modulePath);
+            const todoItemList = await module.getTodoList(owner);
+            createTodoApp(document.getElementById('todo-app'), {
+                title: 'Мои дела',
+                owner,
+                todoItemList,
+                onCreateFormSubmit: module.createTodoItem,
+                onDoneClick: module.switchTodoItemDone,
+                onDeleteClick: module.deleteTodoItem
+            });
+        }
+
+        function loadPage(methodBtn, btnText, mode, modulePath) {
+            methodBtn.textContent = btnText;
+            localStorage.setItem('storageMode', mode);
+            createTodoAppSwitch(modulePath, 'Я');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const methodBtn = document.getElementById('method');
+            let storageMode = localStorage.getItem('storageMode') || 'localStorage';
+
+            if (storageMode === 'localStorage') {
+                loadPage(methodBtn, 'Перейти на серверное хранилище', 'api', './todo-app/api.js');
+            } else if (storageMode === 'api') {
+                loadPage(methodBtn, 'Перейти на локальное хранилище', 'localStorage', './todo-app/localStorage.js');
+            }
+
+            methodBtn.addEventListener('click', () => {
+                if (localStorage.getItem('storageMode') === 'localStorage') {
+                    localStorage.setItem('storageMode', 'api');
+                    loadPage(methodBtn, 'Перейти на локальное хранилище', 'api', './todo-app/api.js');
+                } else if (localStorage.getItem('storageMode') === 'api') {
+                    localStorage.setItem('storageMode', 'localStorage');
+                    loadPage(methodBtn, 'Перейти на серверное хранилище', 'localStorage', './todo-app/localStorage.js');
+                }
+            })
+        });
     </script>
 </head>
 
@@ -22,8 +60,11 @@
         <a class="nav-link" href="mom.html">Дела мамы</a>
     </nav>
 </div>
-<div class="container mb-5"><button class="btn btn-primary" id="method" data-person="Я" data-title="Мои дела"
-                                    data-method="localStorage">Перейти на серверное хранилище</button></div>
+<div class="container mb-5">
+    <button class="btn btn-primary" id="method" data-method="localStorage">
+        Перейти на серверное хранилище
+    </button>
+</div>
 <div id="todo-app" class="container"></div>
 </body>
 

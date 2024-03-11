@@ -1,6 +1,6 @@
 
 function createAppTitle(title) {
-    const appTitle = document.createElement('h2');
+    let appTitle = document.createElement('h2');
     appTitle.innerHTML = title;
     return appTitle;
 }
@@ -31,12 +31,12 @@ function createTodoItemForm() {
 }
 
 function createTodoList() {
-    const list = document.createElement('ul');
+    let list = document.createElement('ul');
     list.classList.add('list-group');
     return list;
 }
 
-function createTodoItemElement(todoItem, { onDone, onDelete }) {
+function createTodoItemElement(task, { onDone, onDelete }) {
     const item = document.createElement('li');
 
     const buttonGroup = document.createElement('div');
@@ -44,11 +44,11 @@ function createTodoItemElement(todoItem, { onDone, onDelete }) {
     const deleteButton = document.createElement('button');
 
     item.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-    if (todoItem.done) {
-        item.classList.add('list-group')
+    if (task.done) {
+        item.classList.add('list-group-item-success')
     }
 
-    item.textContent = todoItem.name;
+    item.textContent = task.name;
 
     buttonGroup.classList.add('btn-group', 'btn-group-sm');
     doneButton.classList.add('btn', 'btn-success');
@@ -57,13 +57,12 @@ function createTodoItemElement(todoItem, { onDone, onDelete }) {
     deleteButton.textContent = 'Удалить';
 
     doneButton.addEventListener('click', function () {
-        onDone({ todoItem, element: item });
-        
-        item.classList.toggle(doneClass, todoItem.done);
+        onDone({ todoItem: task, element: item });
+        item.classList.toggle('list-group-item-success', task.done);
     });
 
     deleteButton.addEventListener('click', function () {
-        onDelete({ todoItem: todoItem, element: item });
+        onDelete({ todoItem: task, element: item });
     });
 
     buttonGroup.append(doneButton);
@@ -73,18 +72,18 @@ function createTodoItemElement(todoItem, { onDone, onDelete }) {
     return item;
 }
 
-async function createTodoApp(container, title, owner) {
+async function createTodoApp(container, title, owner, tasks = []) {
     const todoAppTitle = createAppTitle(title);
     const todoItemForm = createTodoItemForm();
     const todoList = createTodoList();
     const handlers = {
-        onDone({todoItem}){
+        onDone({ todoItem, element }) {
+            console.log(todoItem)
             todoItem.done = !todoItem.done;
             fetch(`http://localhost:3000/api/todos/${todoItem.id}`, {
                 method: 'PATCH',
-                body: JSON.stringify({done: todoItem.done}),
-                headers: {'Content-Type': 'application/json',
-                }
+                body: JSON.stringify({ done: todoItem.done }),
+                headers: { 'Content-Type': 'application/json' }
             });
         },
         onDelete({ todoItem, element }) {
@@ -101,15 +100,15 @@ async function createTodoApp(container, title, owner) {
     container.append(todoItemForm.form);
     container.append(todoList);
 
- 
+    for (const task of tasks) {
+        createTodoItemElement(task, handlers);
+    }
 
     todoItemForm.input.addEventListener('input', function () {
         todoItemForm.button.disabled = todoItemForm.input.value === '';
     })
 
-    const url = `http://localhost:3000/api/todos?owner=${owner}`;
-    const response = await fetch(url);
-    
+    const response = await fetch(`http://localhost:3000/api/todos?owner=${owner}`);
     const todoItemList = await response.json();
 
     todoItemList.forEach(todoItem => {
@@ -137,9 +136,9 @@ async function createTodoApp(container, title, owner) {
 
         const todoItem = await response.json();
 
-        // console.log(todoItem.name)
+        
 
-        const todoItemElement = createTodoItemElement(todoItem, handlers);
+        let todoItemElement = createTodoItemElement(todoItem, handlers);
 
         todoList.append(todoItemElement);
 

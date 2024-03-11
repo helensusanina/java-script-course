@@ -18,7 +18,7 @@ export async function createTodoItem({ owner, name }) {
     return await response.json();
 }
 
-export function switchTodoItemDone({todoItem}) {
+export function switchTodoItemDone(todoItem) {
     todoItem.done = !todoItem.done;
     fetch(`http://localhost:3000/api/todos/${todoItem.id}`, {
         method: 'PATCH',

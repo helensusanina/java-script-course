@@ -27,7 +27,7 @@ export function switchTodoItemDone({ todoItem, element }) {
 export function deleteTodoItem({ element, todoItem }) {
     if (confirm('Вы уверены?')) {
         let tasks = getTodoList(STORAGE_KEY);
-        tasks = tasks.filter(x => x.name !== todoItem.name);
+        tasks = tasks.filter(x => x.name != todoItem.name);
         updateStorage(tasks, STORAGE_KEY);
         element.remove();
     }
