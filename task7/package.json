@@ -1,0 +1,12 @@
+{
+  "name": "card",
+  "description": "Card description",
+  "private": true,
+  "scripts": {},
+  "author": "Alena",
+  "source": "src/index.html",
+  "dependencies": {
+    "parcel": "^2.0.0-beta.2",
+    "redom": "^3.27.1"
+  }
+}
