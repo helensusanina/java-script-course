@@ -112,7 +112,7 @@ function getTodoItem(itemId) {
  */
 function updateTodoItem(itemId, data) {
     const todoItems = getTodoList();
-    const itemIndex = todoItems.findIndex(({ id }) => id === itemId);
+    const itemIndex = todoItems.find(({ id }) => id === itemId);
     if (itemIndex === -1) throw new TodoApiError(404, { message: 'TODO Item Not Found' });
     Object.assign(todoItems[itemIndex], makeTodoItemFromData({ ...todoItems[itemIndex], ...data }));
     writeFileSync(DB_FILE, JSON.stringify(todoItems), { encoding: 'utf8' });
@@ -200,6 +200,8 @@ createServer(async (req, res) => {
         })();
         res.end(JSON.stringify(body));
     } catch (err) {
+        
+        
         // обрабатываем сгенерированную нами же ошибку
         if (err instanceof TodoApiError) {
             res.writeHead(err.statusCode);

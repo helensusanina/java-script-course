@@ -10,7 +10,7 @@ export function getTodoList(storageKey) {
 }
 
 export function createTodoItem({ owner, name }) {
-    const myTask = { name: name, done: false };
+    const myTask = { id: Date.now(), name: name, done: false };
     const tasks = getTodoList(STORAGE_KEY) || [];
     tasks.push(myTask);
     updateStorage(tasks, STORAGE_KEY);
@@ -27,7 +27,7 @@ export function switchTodoItemDone({ todoItem, element }) {
 export function deleteTodoItem({ element, todoItem }) {
     if (confirm('Вы уверены?')) {
         let tasks = getTodoList(STORAGE_KEY);
-        tasks = tasks.filter(x => x.name != todoItem.name);
+        tasks = tasks.filter(x => x.id !== todoItem.id);
         updateStorage(tasks, STORAGE_KEY);
         element.remove();
     }

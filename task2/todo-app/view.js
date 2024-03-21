@@ -1,4 +1,3 @@
-
 function createAppTitle(title) {
     let appTitle = document.createElement('h2');
     appTitle.innerHTML = title;
@@ -6,11 +5,11 @@ function createAppTitle(title) {
 }
 
 function createTodoItemForm() {
-    let form = document.createElement('form');
-    let input = document.createElement('input');
-    let buttonWrapper = document.createElement('div');
-    let button = document.createElement('button');
-
+    const form = document.createElement('form');
+    const input = document.createElement('input');
+    const buttonWrapper = document.createElement('div');
+    const  button = document.createElement('button');
+    
     form.classList.add('input-group', 'mb-3');
     input.classList.add('form-control');
     input.placeholder = 'Введите название нового дела';
@@ -38,7 +37,6 @@ function createTodoList() {
 
 function createTodoItemElement(task, { onDone, onDelete }) {
     const item = document.createElement('li');
-
     const buttonGroup = document.createElement('div');
     const doneButton = document.createElement('button');
     const deleteButton = document.createElement('button');
@@ -49,6 +47,7 @@ function createTodoItemElement(task, { onDone, onDelete }) {
     }
 
     item.textContent = task.name;
+    item.dataset.id = task.id;
 
     buttonGroup.classList.add('btn-group', 'btn-group-sm');
     doneButton.classList.add('btn', 'btn-success');
@@ -87,7 +86,7 @@ async function createTodoApp(container, {title, owner, todoItemList = [], onCrea
     for (const task of todoItemList) {
         createTodoItemElement(task, handlers);
     }
-
+   
     todoItemForm.input.addEventListener('input', function () {
         todoItemForm.button.disabled = todoItemForm.input.value === '';
     })

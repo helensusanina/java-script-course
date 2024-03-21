@@ -6,10 +6,10 @@ function createAppTitle(title) {
 }
 
 function createTodoItemForm() {
-    let form = document.createElement('form');
-    let input = document.createElement('input');
-    let buttonWrapper = document.createElement('div');
-    let button = document.createElement('button');
+    const form = document.createElement('form');
+    const input = document.createElement('input');
+    const buttonWrapper = document.createElement('div');
+    const button = document.createElement('button');
 
     form.classList.add('input-group', 'mb-3');
     input.classList.add('form-control');
@@ -31,7 +31,7 @@ function createTodoItemForm() {
 }
 
 function createTodoList() {
-    let list = document.createElement('ul');
+    const list = document.createElement('ul');
     list.classList.add('list-group');
     return list;
 }
@@ -56,12 +56,12 @@ function createTodoItemElement(task, { onDone, onDelete }) {
     deleteButton.classList.add('btn', 'btn-danger');
     deleteButton.textContent = 'Удалить';
 
-    doneButton.addEventListener('click', function () {
+    doneButton.addEventListener('click', () => {
         onDone({ todoItem: task, element: item });
         item.classList.toggle('list-group-item-success', task.done);
     });
 
-    deleteButton.addEventListener('click', function () {
+    deleteButton.addEventListener('click',  () => {
         onDelete({ todoItem: task, element: item });
     });
 
@@ -73,10 +73,10 @@ function createTodoItemElement(task, { onDone, onDelete }) {
 }
 
 async function createTodoApp(container, title, owner, tasks = []) {
-    const todoAppTitle = createAppTitle(title);
-    const todoItemForm = createTodoItemForm();
-    const todoList = createTodoList();
-    const handlers = {
+    const { createAppTitle } = createAppTitle;
+    const { createTodoItemForm } = createTodoItemForm();
+    const { createTodoList } = createTodoList();
+    const { onDone, onDelete } = {
         onDone({ todoItem, element }) {
             console.log(todoItem)
             todoItem.done = !todoItem.done;
@@ -94,39 +94,39 @@ async function createTodoApp(container, title, owner, tasks = []) {
                 method: 'DELETE'
             });
         }
-    }
+    };
 
-    container.append(todoAppTitle);
-    container.append(todoItemForm.form);
-    container.append(todoList);
+    container.append(createAppTitle(title));
+    container.append(createTodoItemForm.form);
+    container.append(createTodoList);
 
     for (const task of tasks) {
-        createTodoItemElement(task, handlers);
+        createTodoItemElement(task, { onDone, onDelete });
     }
 
-    todoItemForm.input.addEventListener('input', function () {
-        todoItemForm.button.disabled = todoItemForm.input.value === '';
-    })
+    createTodoItemForm.input.addEventListener('input', () => {
+        createTodoItemForm.button.disabled = createTodoItemForm.input.value === '';
+    });
 
     const response = await fetch(`http://localhost:3000/api/todos?owner=${owner}`);
     const todoItemList = await response.json();
 
     todoItemList.forEach(todoItem => {
-        const todoItemElement = createTodoItemElement(todoItem, handlers);
-        todoList.append(todoItemElement);
+        const todoItemElement = createTodoItemElement(todoItem, { onDone, onDelete });
+        createTodoList.append(todoItemElement);
     });
 
-    todoItemForm.form.addEventListener('submit', async e => {
+    createTodoItemForm.form.addEventListener('submit', async e => {
         e.preventDefault();
 
-        if (!todoItemForm.input.value) {
+        if (!createTodoItemForm.input.value) {
             return;
         }
 
         const response = await fetch('http://localhost:3000/api/todos', {
             method: 'POST',
             body: JSON.stringify({
-                name: todoItemForm.input.value.trim(),
+                name: createTodoItemForm.input.value.trim(),
                 owner,
             }),
             headers: {
@@ -136,15 +136,13 @@ async function createTodoApp(container, title, owner, tasks = []) {
 
         const todoItem = await response.json();
 
-        
+        let todoItemElement = createTodoItemElement(todoItem, { onDone, onDelete });
 
-        let todoItemElement = createTodoItemElement(todoItem, handlers);
+        createTodoList.append(todoItemElement);
 
-        todoList.append(todoItemElement);
-
-        todoItemForm.input.value = '';
-        todoItemForm.button.disabled = true;
-    })
+        createTodoItemForm.input.value = '';
+        createTodoItemForm.button.disabled = true;
+    });
 }
 
 export { createTodoApp };
