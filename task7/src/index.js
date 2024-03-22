@@ -1,6 +1,9 @@
 import { el, mount } from 'redom';
 import validator from 'card-validator';
 import IMask from 'imask';
+import visa from './assets/images/visa.png'
+import mastercard from './assets/images/mastercard.png'
+import mir from './assets/images/mir.png'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -40,14 +43,31 @@ const CVCMask = IMask(cvcInput, {
     mask : '000'
 });
 
+function getCardType(cardNumber) {
+    const cardInfo = validator.number(cardNumber);
+    return cardInfo.card ? cardInfo.card.type : null;
+}
+
+const cardLogos = {visa, mastercard, mir}
+
+function setCardLogo(cardType) {
+    const cardLogo = el('img', { src : cardLogos[cardType] , alt: "неверный путь", width: 55, height: 55 });
+    mount(document.getElementById('cardLogoContainer'), cardLogo);
+}
+
+
 cardNumberInput.addEventListener('blur', () => {
     const cardNumber = cardNumberMask.unmaskedValue;
-    if (!validator.number(cardNumber).isValid) {
+    const cardType = getCardType(cardNumber);
+
+    if (!validator.number(cardNumber).isValid || !cardType) {
         cardNumberInput.classList.add('invalid');
     } else {
         cardNumberInput.classList.remove('invalid');
+        setCardLogo(cardType);
     }
 });
+
 
 expirationDateInput.addEventListener('blur', () => {
     const expirationDate = expirationDateMask.unmaskedValue;
@@ -92,21 +112,15 @@ function checkFormValidity(qualifiedName, value) {
     const expirationDate = expirationDateMask.unmaskedValue;
     const cvc = cvcInput.value;
     const email = emailInput.value;
-
-    const isCardNumberValid = validator.number(cardNumber).isValid;
-    const isExpirationDateValid = (expirationDate.length === 4) && (parseInt(expirationDate.slice(0, 2)) <= 12);
-    const isCvcValid = validator.cvv(cvc).isValid;
-    const isEmailValid = emailRegex.test(email);
-
-    if (isCardNumberValid && isExpirationDateValid && isCvcValid && isEmailValid) {
-        payButton.removeAttribute('disabled');
-    } 
-    else {
-        payButton.setAttribute("disabled");
+    
+    const validateFields = {
+        cardNumber: validator.number(cardNumber).isValid,
+        expirationDate: (expirationDate.length === 4) && (+(expirationDate.slice(0, 2)) <= 12),
+        cvc: validator.cvv(cvc).isValid,
+        email: emailRegex.test(email)
     }
+    payButton.disabled = Object.values(validateFields).includes(false);
 }
-
-cardNumberInput.addEventListener('input', checkFormValidity);
-expirationDateInput.addEventListener('input', checkFormValidity);
-cvcInput.addEventListener('input', checkFormValidity);
-emailInput.addEventListener('input', checkFormValidity);
+[cardNumberInput, expirationDateInput, cvcInput, emailInput].forEach(input => {
+    input.addEventListener('input', checkFormValidity);
+})
