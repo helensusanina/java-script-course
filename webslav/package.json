@@ -1,0 +1,30 @@
+{
+  "name": "webslav",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "build": "^0.1.4",
+    "card-validator": "^9.1.0",
+    "css-loader": "^6.10.0",
+    "imask": "^7.5.0",
+    "navigo": "^8.11.1",
+    "redom": "^4.0.0",
+    "sass": "^1.72.0",
+    "sass-loader": "^14.1.1",
+    "save-dev": "^0.0.1-security",
+    "style-loader": "^3.3.4",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-plugin": "^1.0.5"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^5.6.0"
+  }
+}

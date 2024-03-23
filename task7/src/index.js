@@ -112,7 +112,7 @@ function checkFormValidity(qualifiedName, value) {
     const expirationDate = expirationDateMask.unmaskedValue;
     const cvc = cvcInput.value;
     const email = emailInput.value;
-    
+
     const validateFields = {
         cardNumber: validator.number(cardNumber).isValid,
         expirationDate: (expirationDate.length === 4) && (+(expirationDate.slice(0, 2)) <= 12),
