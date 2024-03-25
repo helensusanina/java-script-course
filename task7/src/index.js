@@ -4,18 +4,11 @@ import IMask from 'imask';
 import visa from './assets/images/visa.png'
 import mastercard from './assets/images/mastercard.png'
 import mir from './assets/images/mir.png'
-
+import { createDOMTree } from './dom';
+import {validateCardNumber, validateCVV, validateExpirationDate} from "./validation";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const paymentForm = el('form#paymentForm', [
-    el('input#cardNumber', { type: 'text', placeholder: 'Номер карты', required: true }),
-    el('input#expirationDate', { type: 'text', placeholder: 'Действительна до (ММ/ГГ)', required: true }),
-    el('input#cvc', { type: 'text', placeholder: 'CVC/CVV', required: true }),
-    el('input#email', { type: 'email', placeholder: 'Email', required: true }),
-    el('button#payButton', { type: 'submit', disabled: true }, 'Оплатить')
-]);
-
-mount(document.getElementById('paymentFormContainer'), paymentForm);
+createDOMTree();
 
 const cardNumberInput = document.getElementById('cardNumber');
 const expirationDateInput = document.getElementById('expirationDate');
@@ -55,7 +48,6 @@ function setCardLogo(cardType) {
     mount(document.getElementById('cardLogoContainer'), cardLogo);
 }
 
-
 cardNumberInput.addEventListener('blur', () => {
     const cardNumber = cardNumberMask.unmaskedValue;
     const cardType = getCardType(cardNumber);
@@ -67,7 +59,6 @@ cardNumberInput.addEventListener('blur', () => {
         setCardLogo(cardType);
     }
 });
-
 
 expirationDateInput.addEventListener('blur', () => {
     const expirationDate = expirationDateMask.unmaskedValue;
@@ -114,13 +105,15 @@ function checkFormValidity(qualifiedName, value) {
     const email = emailInput.value;
 
     const validateFields = {
-        cardNumber: validator.number(cardNumber).isValid,
-        expirationDate: (expirationDate.length === 4) && (+(expirationDate.slice(0, 2)) <= 12),
-        cvc: validator.cvv(cvc).isValid,
+        cardNumber: validateCardNumber(cardNumber),
+        expirationDate: validateExpirationDate(expirationDate),
+        cvc: validateCVV(cvc),
         email: emailRegex.test(email)
     }
     payButton.disabled = Object.values(validateFields).includes(false);
 }
+
 [cardNumberInput, expirationDateInput, cvcInput, emailInput].forEach(input => {
     input.addEventListener('input', checkFormValidity);
 })
+
